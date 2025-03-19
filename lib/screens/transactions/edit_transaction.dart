@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../../components/dialogs/yb_dialog_message.dart';
 import '../../components/fields/yb_date_field.dart';
 import '../../components/fields/yb_number_field.dart';
 import '../../components/fields/yb_text_field.dart';
+import '../../components/fields/yb_dropdown_field.dart';
 import '../../components/screens/yb_app_bar.dart';
 import '../../database/firebase_database.dart';
 import 'list_transactions.dart';
@@ -24,6 +24,7 @@ class _EditTransactionState extends State<EditTransaction> {
   final TextEditingController _valorController = TextEditingController();
   final TextEditingController _dataController = TextEditingController();
 
+  String? _selectedTipoTransacao;
   final FirebaseService _firebaseService = FirebaseService();
 
   @override
@@ -43,7 +44,7 @@ class _EditTransactionState extends State<EditTransaction> {
 
     return ComponenteGeral(
       sizeScreen: sizeScreen,
-      child: SingleChildScrollView(  // Garantir que o conteúdo possa rolar ao mostrar o teclado
+      child: SingleChildScrollView(
         child: Column(
           children: [
             Container(
@@ -69,13 +70,25 @@ class _EditTransactionState extends State<EditTransaction> {
                   hint: 'Destinatário',
                   labelText: 'Destinatário',
                   labelColor: Colors.white,
+                  fillColor: Colors.transparent,
+                  textColor: Colors.grey,
+                  security: null
                 ),
-                YBTextField(
-                  controller: _tipoTransacaoController,
+                YBDropdownField(
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedTipoTransacao = value;
+                    });
+                  },
                   sizeScreen: sizeScreen,
-                  hint: 'Tipo de transação',
+                  hint: '---',
                   labelText: 'Tipo de transação',
                   labelColor: Colors.white,
+                  fieldBackgroundColor: Colors.transparent,
+                  menuBackgroundColor: Colors.black,
+                  borderColor: Colors.black,
+                  textColor: Colors.grey,
+                  fillColor: Colors.transparent,
                 ),
                 YBNumberField(
                   controller: _valorController,
@@ -83,6 +96,8 @@ class _EditTransactionState extends State<EditTransaction> {
                   hint: 'Valor',
                   labelText: 'Valor',
                   labelColor: Colors.white,
+                  fillColor: Colors.transparent,
+                  textColor: Colors.grey,
                 ),
                 YBDateField(
                   controller: _dataController,
@@ -90,6 +105,8 @@ class _EditTransactionState extends State<EditTransaction> {
                   hint: 'Data',
                   labelText: 'Data',
                   labelColor: Colors.white,
+                  fillColor: Colors.transparent,
+                  textColor: Colors.grey,
                 ),
               ],
             ),
@@ -115,7 +132,7 @@ class _EditTransactionState extends State<EditTransaction> {
                   ),
                   onPressed: () async {
                     String destinatarioTransacao = _destinatarioController.text.trim();
-                    String tipoTransacao = _tipoTransacaoController.text.trim();
+                    String tipoTransacao = _selectedTipoTransacao ?? '';
                     String valorTransacao = _valorController.text.trim();
                     String dataTransacao = _dataController.text.trim();
 
@@ -152,6 +169,7 @@ class _EditTransactionState extends State<EditTransaction> {
                         title: 'Sucesso',
                         message: 'Sua transação foi atualizada.',
                       );
+
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => ListTransactions()),

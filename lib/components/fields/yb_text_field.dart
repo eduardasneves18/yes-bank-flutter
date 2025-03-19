@@ -86,16 +86,16 @@ class _YBTextFieldState extends State<YBTextField> {
           prefixIcon: widget.icon != null
               ? Icon(widget.icon, color: _iconColor, size: _widthScreen * 0.06)
               : null,
-          suffixIcon: widget.security != null
-              ? IconButton(
+          suffixIcon: widget.security != true
+              ? null :
+          IconButton(
               color: widget.iconColor,
               icon: Icon(getIconSecury()),
               onPressed: () {
                 setState(() {
                   showSecurityPassword = !showSecurityPassword;
                 });
-              })
-              : null,
+              }),
           contentPadding: EdgeInsets.symmetric(horizontal: _widthScreen * 0.02),
         ),
         obscureText: widget.security != null && showSecurityPassword,

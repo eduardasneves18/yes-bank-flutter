@@ -65,8 +65,13 @@ class _YBNumberFieldState extends State<YBNumberField> {
         cursorColor: _cursorColor,
         keyboardType: _keyboardType,
         decoration: InputDecoration(
+          labelText: widget.labelText,
+          labelStyle: TextStyle(color: widget.labelColor ?? Colors.black),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: _borderColor, width: 1),
+            borderSide: BorderSide(
+              color: _borderColor,
+              width: (1),
+            ),
             borderRadius: const BorderRadius.all(Radius.circular(8.0)),
           ),
           border: OutlineInputBorder(

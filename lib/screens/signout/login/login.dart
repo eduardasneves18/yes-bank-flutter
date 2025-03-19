@@ -6,6 +6,7 @@ import 'package:yes_bank/screens/transactions/insert_transaction.dart';
 
 import '../../../components/dialogs/yb_dialog_message.dart';
 import '../../../database/firebase_database.dart';
+import '../../home/home_dashboard.dart';
 
 final TextEditingController _emailController = TextEditingController();
 final TextEditingController _senhaController = TextEditingController();
@@ -103,7 +104,8 @@ class Form extends StatelessWidget {
             textColor: Colors.grey,
             cursorColor: Colors.black,
             fillColor: Colors.transparent,
-            labelColor: Colors.green,
+            labelColor: Colors.white,
+            security: null,
           ),
           YBTextField(
             controller: _senhaController,
@@ -116,7 +118,6 @@ class Form extends StatelessWidget {
             fillColor: Colors.transparent,
             security: true,
           ),
-          // Corrigindo o trecho do link clicável
           Container(
             padding: EdgeInsets.symmetric(
                 vertical: sizeScreen.height * 0.01,
@@ -199,7 +200,7 @@ class Form extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Transaction(),
+                        builder: (context) => HomeDashboard(),
                       ),
                     );
                   } catch (e) {

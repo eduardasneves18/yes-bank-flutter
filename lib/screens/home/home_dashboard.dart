@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:yes_bank/components/charts/yb_transaction_chart.dart';
 import '../../components/screens/yb_app_bar.dart';
+import '../transactions/insert_transaction.dart';
+import '../transactions/list_transactions.dart';
 
 class HomeDashboard extends StatelessWidget {
   @override
@@ -31,15 +33,136 @@ class HomeDashboard extends StatelessWidget {
               Container(
                 margin: EdgeInsets.only(top: sizeScreen.height * 0.03),
                 alignment: Alignment.bottomLeft,
-                child: Text(
-                  'Gráficos de analise de transações',
-                  style: TextStyle(
-                    fontSize: sizeScreen.width * 0.04,
-                    color: Colors.white,
-                  ),
+                child: Column(
+                  children: [
+                    Card(
+                      color: Colors.transparent,
+                      margin: EdgeInsets.all(10),
+                      child: ListTile(
+                        textColor: Colors.white,
+                        title: Text(
+                          'Saldo:',
+                          style: TextStyle(
+                            fontSize: sizeScreen.width * 0.05,
+                          ),
+                        ),
+                        trailing: Text('0,00', style: TextStyle(
+                          fontSize: sizeScreen.width * 0.05,
+                        ),
+                        ),
+                      ),
+                    ),
+                    Card(
+                      color: Colors.transparent,
+                      margin: EdgeInsets.all(10),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Gráficos de analise de transações',
+                              style: TextStyle(
+                                fontSize: sizeScreen.width * 0.04,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(height: sizeScreen.height * 0.02),
+                            TransactionsBarChart(),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Card(
+                            color: Colors.transparent,
+                            margin: EdgeInsets.all(9),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Center(
+                                child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height: sizeScreen.height * 0.02),
+                                  Center(child: IconButton(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => Transaction(),
+                                        ),
+                                      );
+                                    },
+                                    icon: Icon(
+                                      Icons.swap_horiz,
+                                      color: Colors.white,
+                                      size: sizeScreen.width * 0.10,
+                                    ),
+                                  ),),
+                                  Center( child:
+                                  Text(
+                                    'Nova transação',
+                                    style: TextStyle(
+                                      fontSize: sizeScreen.width * 0.04,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  ),
+                                ],
+                              ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Card(
+                            color: Colors.transparent,
+                            margin: EdgeInsets.all(10),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child:
+                              Center(
+                                child:
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: sizeScreen.height * 0.02),
+                                    IconButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ListTransactions(),
+                                          ),
+                                        );
+                                      },
+                                      icon: Icon(
+                                        Icons.request_page,
+                                        color: Colors.white,
+                                        size: sizeScreen.width * 0.09,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Extrato',
+                                      style: TextStyle(
+                                        fontSize: sizeScreen.width * 0.04,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              TransactionsBarChart(),
             ],
           ),
         ),

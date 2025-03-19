@@ -18,12 +18,12 @@ class _ListTransactionsState extends State<ListTransactions> {
   List<Map<String, dynamic>> _transactions = [];
   List<Map<String, dynamic>> _filteredTransactions = [];
   bool _isLoading = true;
-  bool _isFetchingMore = false;  // Controle se estamos buscando mais dados
-  String? _lastTransactionId;    // ID da última transação carregada
+  bool _isFetchingMore = false;
+  String? _lastTransactionId;
 
   final ScrollController _scrollController = ScrollController();
 
-  bool _isFiltering = false; // Controle se o filtro está aplicado ou não
+  bool _isFiltering = false;
 
   @override
   void initState() {
@@ -32,9 +32,8 @@ class _ListTransactionsState extends State<ListTransactions> {
     _scrollController.addListener(_scrollListener);
   }
 
-  // Método para carregar transações com paginação
   Future<void> _loadTransactions() async {
-    if (_isFetchingMore) return;  // Evita chamadas duplicadas enquanto estamos buscando dados
+    if (_isFetchingMore) return;
     setState(() {
       _isLoading = true;
     });
@@ -155,7 +154,6 @@ class _ListTransactionsState extends State<ListTransactions> {
     });
   }
 
-  // Exibe o filtro no modal
   void _openFilterModal() {
     showModalBottomSheet(
       context: context,

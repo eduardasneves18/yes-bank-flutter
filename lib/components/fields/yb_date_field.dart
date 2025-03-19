@@ -44,7 +44,7 @@ class _YBDateFieldState extends State<YBDateField> {
   @override
   Widget build(BuildContext context) {
     final widthScreen = widget.sizeScreen.width;
-    final Color borderColor = widget.borderColor ?? Theme.of(context).primaryColor;
+    final Color _borderColor = widget.borderColor ?? Theme.of(context).primaryColor;
     final Color? textColor = widget.textColor ?? Theme.of(context).primaryColor;
     final Color? cursorColor = widget.cursorColor ?? Theme.of(context).primaryColor;
 
@@ -78,8 +78,13 @@ class _YBDateFieldState extends State<YBDateField> {
         cursorColor: cursorColor,
         keyboardType: keyboardType,
         decoration: InputDecoration(
+          labelText: widget.labelText,
+          labelStyle: TextStyle(color: widget.labelColor ?? Colors.black),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: borderColor, width: 1),
+            borderSide: BorderSide(
+              color: _borderColor,
+              width: (1),
+            ),
             borderRadius: const BorderRadius.all(Radius.circular(8.0)),
           ),
           border: OutlineInputBorder(

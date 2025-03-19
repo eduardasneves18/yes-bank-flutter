@@ -50,7 +50,7 @@ class _YBDropDownFieldState extends State<YBDropdownField> {
     final Color menuBackgroundColor = widget.menuBackgroundColor ?? Colors.white;
 
     return Padding(
-      padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+      padding: const EdgeInsets.only(left: 15.0, right: 15.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

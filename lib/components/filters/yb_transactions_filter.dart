@@ -74,12 +74,12 @@ class _YbTransactionsFilterState extends State<YbTransactionsFilter> {
                   })
                   ;
                 },
-                hint: 'Data',
+                hint: 'Tipo transação',
                 borderColor: Colors.black,
                 textColor: Colors.black,
                 fillColor: Colors.transparent,
                 labelColor: Colors.white,
-                labelText: 'Data',
+                labelText: 'Tipo transação',
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),

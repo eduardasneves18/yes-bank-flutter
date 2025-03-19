@@ -2,7 +2,7 @@ import 'package:yes_bank/components/fields/yb_text_field.dart';
 import 'package:flutter/material.dart';
 import '../../../components/dialogs/yb_dialog_message.dart';
 import '../../../database/firebase_database.dart';
-import '../../transactions/insert_transaction.dart'  as transaction_screen;
+import '../../home/home_dashboard.dart';
 
 class Register extends StatefulWidget {
   @override
@@ -110,7 +110,7 @@ class Form extends StatelessWidget {
     required this.confirmPassController,
   }) : super(key: key);
 
-  Widget _buildTextField(TextEditingController controller, String hint, IconData icon, {TextInputType textType = TextInputType.text, bool obscureText = false}) {
+  Widget _buildTextField(TextEditingController controller, String hint, IconData icon, {TextInputType textType = TextInputType.text,  obscureText}) {
     return Container(
       margin: EdgeInsets.only(top: 16),
       child: YBTextField(
@@ -120,7 +120,7 @@ class Form extends StatelessWidget {
         iconColor: Colors.black,
         hint: hint,
         hintColor: Colors.white,
-        fillColor: Color.fromRGBO(1, 1, 1, 0.2),
+        fillColor: Colors.transparent,
         cursorColor: Colors.white,
         textType: textType,
         borderColor: Colors.black,
@@ -183,7 +183,7 @@ class Form extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => transaction_screen.Transaction()
+                  builder: (context) => HomeDashboard()
                 ),
               );
 
@@ -196,7 +196,6 @@ class Form extends StatelessWidget {
     );
   }
 
-  // Método para o ícone de voltar
   Widget _buildBackButton(BuildContext context) {
     return Align(
       alignment: Alignment.bottomLeft,
@@ -220,8 +219,8 @@ class Form extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildTextField(nameController, 'Nome', Icons.person,obscureText: false),
-        _buildTextField(emailController, 'E-mail', Icons.email, textType: TextInputType.emailAddress, obscureText: false),
+        _buildTextField(nameController, 'Nome', Icons.person,obscureText: null),
+        _buildTextField(emailController, 'E-mail', Icons.email, textType: TextInputType.emailAddress, obscureText: null),
         _buildTextField(passController, 'Senha', Icons.lock_outline, obscureText: true),
         _buildTextField(confirmPassController, 'Confirmar senha', Icons.lock_outline, obscureText: true),
         _buildRegisterButton(context),

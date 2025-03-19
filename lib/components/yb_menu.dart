@@ -54,7 +54,7 @@ class Menu extends StatelessWidget {
           ),
           ListTile(
             leading: Icon(Icons.request_page),
-            title: Text('Extrato'),
+            title: Text('Lista de transações'),
             onTap: () {
               Navigator.push(
                 context,
