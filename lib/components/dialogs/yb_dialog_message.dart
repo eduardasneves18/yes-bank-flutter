@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class DialogMessage {
-  static void showMessage({
+  static Future<void> showMessage({
     required BuildContext context,
     required String title,
     required String message,
   }) {
-    showDialog(
+    return showDialog<void>(
       barrierDismissible: false,
       context: context,
       builder: (context) => AlertDialog(

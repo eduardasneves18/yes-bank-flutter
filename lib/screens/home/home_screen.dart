@@ -8,7 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../store/cliente_store.dart';
-import '../transactions/insert_transaction.dart';
+import '../signout/login/login.dart';
 import 'home_dashboard.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -46,9 +46,9 @@ class HomeScreen extends StatelessWidget {
           case ConnectionState.done:
             if (snapshot.data != null && snapshot.hasData) {
               // this._loginWithSavedUser(cliente, clienteStore, context);
-              return Container(color: Colors.white);
+              return HomeDashboard();
             } else {
-              return Transaction();
+              return Login();
             }
         }
       },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class YBTextField extends StatefulWidget {
+class YBEmailField extends StatefulWidget {
   final Size sizeScreen;
   final IconData? icon;
   final Color? iconColor;
@@ -16,7 +17,7 @@ class YBTextField extends StatefulWidget {
   final Color? labelColor;
   final TextEditingController controller;
 
-  const YBTextField({
+  const YBEmailField({
     Key? key,
     required this.sizeScreen,
     this.icon,
@@ -35,10 +36,10 @@ class YBTextField extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _YBTextFieldState createState() => _YBTextFieldState();
+  _YBEmailFieldState createState() => _YBEmailFieldState();
 }
 
-class _YBTextFieldState extends State<YBTextField> {
+class _YBEmailFieldState extends State<YBEmailField> {
   bool showSecurityPassword = true;
 
   Widget build(BuildContext context) {
@@ -47,7 +48,7 @@ class _YBTextFieldState extends State<YBTextField> {
     final Color? _textColor = widget.textColor ?? Theme.of(context).primaryColor;
     final Color? _cursorColor = widget.cursorColor ?? Theme.of(context).primaryColor;
 
-    final TextInputType? _keyboardType = widget.textType ?? TextInputType.text;
+    final TextInputType _keyboardType = TextInputType.emailAddress;
     final TextStyle _hintStyle = TextStyle(color: widget.hintColor ?? Colors.grey[500]);
     final Color? _iconColor = widget.iconColor ?? Colors.grey[500];
 
@@ -76,7 +77,8 @@ class _YBTextFieldState extends State<YBTextField> {
           ),
           border: OutlineInputBorder(
             borderSide: BorderSide(
-                color: _borderColor),
+              color: _borderColor,
+            ),
             borderRadius: const BorderRadius.all(Radius.circular(8.0)),
           ),
           filled: true,
@@ -85,8 +87,36 @@ class _YBTextFieldState extends State<YBTextField> {
           fillColor: widget.fillColor ?? Colors.white,
           prefixIcon: widget.icon != null
               ? Icon(widget.icon, color: _iconColor, size: _widthScreen * 0.06)
-              : null,)
+              : null,
+          suffixIcon: widget.security != true
+              ? null
+              : IconButton(
+              color: widget.iconColor,
+              icon: Icon(getIconSecury()),
+              onPressed: () {
+                setState(() {
+                  showSecurityPassword = !showSecurityPassword;
+                });
+              }),
+          contentPadding: EdgeInsets.symmetric(horizontal: _widthScreen * 0.02),
+        ),
+        obscureText: widget.security != null && showSecurityPassword,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Por favor, insira um email';
+          }
+          String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+          RegExp regex = RegExp(pattern);
+          if (!regex.hasMatch(value)) {
+            return 'Por favor, insira um email válido';
+          }
+          return null;
+        },
       ),
     );
+  }
+
+  IconData getIconSecury() {
+    return showSecurityPassword ? Icons.visibility : Icons.visibility_off;
   }
 }

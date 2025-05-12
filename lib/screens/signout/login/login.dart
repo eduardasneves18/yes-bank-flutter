@@ -1,16 +1,21 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:yes_bank/components/fields/yb_text_field.dart';
+import 'package:yes_bank/models/cliente.dart';
 import 'package:yes_bank/screens/signout/register/register.dart';
-import 'package:yes_bank/screens/transactions/insert_transaction.dart';
+import 'package:yes_bank/services/firebase/sessions/sessionManager.dart';
+import 'package:yes_bank/store/cliente_store.dart';
 
 import '../../../components/dialogs/yb_dialog_message.dart';
-import '../../../database/firebase_database.dart';
+import '../../../components/fields/yb_password_field.dart';
+import '../../../services/firebase/login/login_firebase.dart';
 import '../../home/home_dashboard.dart';
 
 final TextEditingController _emailController = TextEditingController();
 final TextEditingController _senhaController = TextEditingController();
-final FirebaseService _firebaseService = FirebaseService();
+final LoginFirebaseAuthService _loginFirebaseService = LoginFirebaseAuthService();
 
 class Login extends StatelessWidget {
   @override
@@ -91,6 +96,7 @@ class Form extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ClienteStore _clienteStore = Provider.of<ClienteStore>(context);
     return Container(
       margin: EdgeInsets.only(top: sizeScreen.width * 0.05),
       child: Column(
@@ -107,7 +113,7 @@ class Form extends StatelessWidget {
             labelColor: Colors.white,
             security: null,
           ),
-          YBTextField(
+          YBPasswordField(
             controller: _senhaController,
             sizeScreen: sizeScreen,
             icon: Icons.lock_outline,
@@ -195,7 +201,13 @@ class Form extends StatelessWidget {
                   }
 
                   try {
-                    await _firebaseService.loginWithEmailPassword(email, senha);
+                    User? user = await _loginFirebaseService.signInWithEmailPassword(email, senha, _clienteStore);
+
+                    if (user?.uid != null){
+                      Cliente cliente = Cliente(id: user?.uid, email: user?.email, nome: user?.displayName, password: null, primeiroNome: null, ultimoNome: null);
+                      SessionManager sessionmanager = SessionManager(_loginFirebaseService, cliente, _clienteStore);
+                    }
+
 
                     Navigator.push(
                       context,

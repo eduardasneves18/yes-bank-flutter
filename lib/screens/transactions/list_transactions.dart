@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:yes_bank/components/dialogs/yb_dialog_message.dart';
-import 'package:yes_bank/database/firebase_database.dart';
+import 'package:yes_bank/services/firebase.dart';
 import 'package:yes_bank/screens/transactions/edit_transaction.dart';
 
 import '../../components/filters/yb_transactions_filter.dart';
 import '../../components/screens/yb_app_bar.dart';
 import '../../components/yb_menu.dart';
+import '../../services/firebase/transactions/transactions_firebase.dart';
 
 class ListTransactions extends StatefulWidget {
   @override
@@ -14,7 +15,7 @@ class ListTransactions extends StatefulWidget {
 }
 
 class _ListTransactionsState extends State<ListTransactions> {
-  final FirebaseService _firebaseService = FirebaseService();
+  final TransactionsFirebaseService _firebaseService = TransactionsFirebaseService();
   List<Map<String, dynamic>> _transactions = [];
   List<Map<String, dynamic>> _filteredTransactions = [];
   bool _isLoading = true;
@@ -34,6 +35,8 @@ class _ListTransactionsState extends State<ListTransactions> {
 
   Future<void> _loadTransactions() async {
     if (_isFetchingMore) return;
+
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
     });
@@ -46,6 +49,7 @@ class _ListTransactionsState extends State<ListTransactions> {
           lastTransactionId: _lastTransactionId,
         );
 
+        if (!mounted) return;
         setState(() {
           if (transactions.isNotEmpty) {
             _lastTransactionId = transactions.last['transactionId'];
@@ -54,27 +58,32 @@ class _ListTransactionsState extends State<ListTransactions> {
           _isLoading = false;
         });
       } else {
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
         });
-        DialogMessage.showMessage(
+
+        if (!mounted) return;
+         DialogMessage.showMessage(
           context: context,
           title: 'Erro',
           message: 'Usuário não autenticado. Por favor, faça login novamente.',
         );
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });
-      DialogMessage.showMessage(
+
+      if (!mounted) return;
+      await DialogMessage.showMessage(
         context: context,
         title: 'Erro',
         message: 'Falha ao carregar transações. Tente novamente.',
       );
     }
   }
-
 
   void _scrollListener() {
     if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
@@ -117,22 +126,25 @@ class _ListTransactionsState extends State<ListTransactions> {
 
   void _editTransaction(Map<String, dynamic> transaction) {
     Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => EditTransaction(transaction: transaction))
+      context,
+      MaterialPageRoute(builder: (context) => EditTransaction(transaction: transaction)),
     );
   }
 
-  void _deleteTransaction(Map<String, dynamic> transaction) async {
+  Future<void> _deleteTransaction(Map<String, dynamic> transaction) async {
     try {
       await _firebaseService.deleteTransaction(transaction['transactionId']);
-      _loadTransactions();
-      DialogMessage.showMessage(
+      await _loadTransactions();
+
+      if (!mounted) return;
+      await DialogMessage.showMessage(
         context: context,
         title: 'Sucesso',
         message: 'Transação deletada!',
       );
     } catch (e) {
-      DialogMessage.showMessage(
+      if (!mounted) return;
+      await DialogMessage.showMessage(
         context: context,
         title: 'Erro',
         message: 'Falha ao deletar transação. Tente novamente.',
@@ -237,12 +249,21 @@ class _ListTransactionsState extends State<ListTransactions> {
                   ? Center(child: Text('Não há transações para exibir.'))
                   : ListView.builder(
                 controller: _scrollController,
-                itemCount: (_filteredTransactions.isEmpty ? _transactions : _filteredTransactions).length + (_isFetchingMore ? 1 : 0),
+                itemCount: (_filteredTransactions.isEmpty
+                    ? _transactions
+                    : _filteredTransactions)
+                    .length +
+                    (_isFetchingMore ? 1 : 0),
                 itemBuilder: (context, index) {
-                  if (index == (_filteredTransactions.isEmpty ? _transactions : _filteredTransactions).length) {
+                  if (index ==
+                      (_filteredTransactions.isEmpty
+                          ? _transactions
+                          : _filteredTransactions).length) {
                     return Center(child: CircularProgressIndicator());
                   }
-                  var transaction = (_filteredTransactions.isEmpty ? _transactions : _filteredTransactions)[index];
+                  var transaction = (_filteredTransactions.isEmpty
+                      ? _transactions
+                      : _filteredTransactions)[index];
                   return Card(
                     color: Colors.transparent,
                     margin: EdgeInsets.all(10),

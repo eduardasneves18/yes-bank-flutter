@@ -2,7 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../database/firebase_database.dart';
+import '../../services/firebase.dart';
+import '../../services/firebase/transactions/transactions_firebase.dart';
 
 class TransactionsBarChart extends StatefulWidget {
   const TransactionsBarChart({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class TransactionsBarChartState extends State<TransactionsBarChart> {
     User? user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
-      FirebaseService().getTransactions(user.uid).then((fetchedTransactions) {
+      TransactionsFirebaseService().getTransactions(user.uid).then((fetchedTransactions) {
         List<Map<String, dynamic>> _transactions = fetchedTransactions.map((transaction) {
           double valor = (transaction['valor'] is double)
               ? transaction['valor']

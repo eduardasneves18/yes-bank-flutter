@@ -1,13 +1,22 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:yes_bank/services/firebase/login/login_firebase.dart';
 
+import '../models/cliente.dart';
 import '../screens/home/home_dashboard.dart';
 import '../screens/signout/login/login.dart';
 import '../screens/transactions/insert_transaction.dart';
 import '../screens/transactions/list_transactions.dart';
+import '../services/firebase/sessions/sessionManager.dart';
+import '../services/firebase/users/user_firebase.dart';
+import '../store/cliente_store.dart';
 
 class Menu extends StatelessWidget {
   @override
+
   Widget build(BuildContext context) {
+  final ClienteStore _clienteStore = Provider.of<ClienteStore>(context);
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -65,10 +74,32 @@ class Menu extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.output),
             title: Text('Sair'),
-            onTap: () {
-              Navigator.push(
+            onTap: () async {
+              final usersService = UsersFirebaseService();
+              final loginService = LoginFirebaseAuthService();
+
+              User? user = await usersService.getUser();
+
+              if (user?.uid != null) {
+                Cliente cliente = Cliente(
+                  id: user!.uid,
+                  email: user.email,
+                  nome: user.displayName,
+                );
+
+                final sessionManager = SessionManager(
+                  loginService,
+                  cliente,
+                  _clienteStore,
+                );
+
+                await sessionManager.logout();
+              }
+
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => Login()),
+                    (Route<dynamic> route) => false,
               );
             },
           ),

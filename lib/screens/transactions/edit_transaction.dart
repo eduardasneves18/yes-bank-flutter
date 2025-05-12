@@ -6,7 +6,8 @@ import '../../components/fields/yb_number_field.dart';
 import '../../components/fields/yb_text_field.dart';
 import '../../components/fields/yb_dropdown_field.dart';
 import '../../components/screens/yb_app_bar.dart';
-import '../../database/firebase_database.dart';
+import '../../services/firebase.dart';
+import '../../services/firebase/transactions/transactions_firebase.dart';
 import 'list_transactions.dart';
 
 class EditTransaction extends StatefulWidget {
@@ -25,14 +26,13 @@ class _EditTransactionState extends State<EditTransaction> {
   final TextEditingController _dataController = TextEditingController();
 
   String? _selectedTipoTransacao;
-  final FirebaseService _firebaseService = FirebaseService();
+  final TransactionsFirebaseService _firebaseService = TransactionsFirebaseService();
 
   @override
   void initState() {
     super.initState();
-
     _destinatarioController.text = widget.transaction['destinatario'] ?? '';
-    _tipoTransacaoController.text = widget.transaction['tipoTransacao'] ?? '';
+    _selectedTipoTransacao = widget.transaction['tipo_transacao'] ?? '';
     _valorController.text = widget.transaction['valor'].toString();
     _dataController.text = widget.transaction['data'] ?? '';
   }
@@ -72,7 +72,7 @@ class _EditTransactionState extends State<EditTransaction> {
                   labelColor: Colors.white,
                   fillColor: Colors.transparent,
                   textColor: Colors.grey,
-                  security: null
+                  security: null,
                 ),
                 YBDropdownField(
                   onChanged: (value) {
@@ -156,12 +156,15 @@ class _EditTransactionState extends State<EditTransaction> {
                         return;
                       }
 
+                      // Atualiza a transação no Firebase
                       await _firebaseService.updateTransaction(
                         widget.transaction['transactionId'],
-                        destinatarioTransacao,
-                        tipoTransacao,
-                        valor,
-                        dataTransacao,
+                        {
+                          'destinatario': destinatarioTransacao,
+                          'tipo_transacao': tipoTransacao,
+                          'valor': valor,
+                          'data': dataTransacao,
+                        },
                       );
 
                       DialogMessage.showMessage(
@@ -170,10 +173,8 @@ class _EditTransactionState extends State<EditTransaction> {
                         message: 'Sua transação foi atualizada.',
                       );
 
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ListTransactions()),
-                      );
+                      // Retorna para a tela anterior após atualização
+                      Navigator.pop(context);
                     } catch (e) {
                       DialogMessage.showMessage(
                         context: context,

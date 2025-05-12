@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:yes_bank/components/fields/yb_dropdown_field.dart';
-import '../../database/firebase_database.dart';
+import '../../services/firebase.dart';
+import '../../services/firebase/transactions/transactions_firebase.dart';
 
 class YbTransactionsFilter extends StatefulWidget {
   final Function(List<Map<String, dynamic>>) onFilterApplied;
@@ -23,7 +24,7 @@ class _YbTransactionsFilterState extends State<YbTransactionsFilter> {
   final _dataController = TextEditingController();
 
   void _applyFilter() {
-    FirebaseService firebaseService = FirebaseService();
+    TransactionsFirebaseService firebaseService = TransactionsFirebaseService();
 
     String? destinatario = _selectedDestinatario?.isEmpty ?? true ? null : _selectedDestinatario;
     double? valor = _selectedValor == null || _selectedValor == 0 ? null : _selectedValor;

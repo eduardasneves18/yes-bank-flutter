@@ -1,7 +1,8 @@
 import 'package:yes_bank/components/fields/yb_text_field.dart';
+import 'package:yes_bank/components/fields/yb_password_field.dart'; // import da nova classe
 import 'package:flutter/material.dart';
 import '../../../components/dialogs/yb_dialog_message.dart';
-import '../../../database/firebase_database.dart';
+import '../../../services/firebase/users/user_firebase.dart';
 import '../../home/home_dashboard.dart';
 
 class Register extends StatefulWidget {
@@ -10,12 +11,12 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  final FirebaseService _firebaseService = FirebaseService();
+  final UsersFirebaseService _firebaseService = UsersFirebaseService();
 
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passController = TextEditingController();
-  TextEditingController _confirmPassController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passController = TextEditingController();
+  final TextEditingController _confirmPassController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +47,8 @@ class _RegisterState extends State<Register> {
             children: <Widget>[
               Welcome(sizeScreen: sizeScreen),
               GestureDetector(
-                child: Form(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: RegisterForm(
                   sizeScreen: sizeScreen,
                   firebaseService: _firebaseService,
                   nameController: _nameController,
@@ -54,7 +56,6 @@ class _RegisterState extends State<Register> {
                   passController: _passController,
                   confirmPassController: _confirmPassController,
                 ),
-                onTap: () => FocusScope.of(context).unfocus(),
               ),
             ],
           ),
@@ -92,15 +93,15 @@ class Welcome extends StatelessWidget {
   }
 }
 
-class Form extends StatelessWidget {
+class RegisterForm extends StatelessWidget {
   final Size sizeScreen;
-  final FirebaseService firebaseService;
+  final UsersFirebaseService firebaseService;
   final TextEditingController nameController;
   final TextEditingController emailController;
   final TextEditingController passController;
   final TextEditingController confirmPassController;
 
-  const Form({
+  const RegisterForm({
     Key? key,
     required this.sizeScreen,
     required this.firebaseService,
@@ -110,7 +111,8 @@ class Form extends StatelessWidget {
     required this.confirmPassController,
   }) : super(key: key);
 
-  Widget _buildTextField(TextEditingController controller, String hint, IconData icon, {TextInputType textType = TextInputType.text,  obscureText}) {
+  Widget _buildTextField(TextEditingController controller, String hint, IconData icon,
+      {TextInputType textType = TextInputType.text}) {
     return Container(
       margin: EdgeInsets.only(top: 16),
       child: YBTextField(
@@ -125,7 +127,26 @@ class Form extends StatelessWidget {
         textType: textType,
         borderColor: Colors.black,
         textColor: Colors.white,
-        security: obscureText,
+      ),
+    );
+  }
+
+  Widget _buildPasswordField(TextEditingController controller, String hint) {
+    return Container(
+      margin: EdgeInsets.only(top: 16),
+      child: YBPasswordField(
+        controller: controller,
+        hint: hint,
+        sizeScreen: sizeScreen,
+        labelColor: Colors.white,
+        icon: Icons.lock_outline,
+        iconColor: Colors.black,
+        hintColor: Colors.white,
+        fillColor: Colors.transparent,
+        cursorColor: Colors.white,
+        borderColor: Colors.black,
+        textColor: Colors.white,
+        textType: TextInputType.visiblePassword,
       ),
     );
   }
@@ -182,13 +203,11 @@ class Form extends StatelessWidget {
             try {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => HomeDashboard()
-                ),
+                MaterialPageRoute(builder: (context) => HomeDashboard()),
               );
-
             } catch (e) {
-              DialogMessage.showMessage(context: context, title: 'Erro', message: 'Falha ao criar o usuário. Tente novamente.');
+              DialogMessage.showMessage(
+                  context: context, title: 'Erro', message: 'Falha ao criar o usuário. Tente novamente.');
             }
           },
         ),
@@ -219,10 +238,10 @@ class Form extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildTextField(nameController, 'Nome', Icons.person,obscureText: null),
-        _buildTextField(emailController, 'E-mail', Icons.email, textType: TextInputType.emailAddress, obscureText: null),
-        _buildTextField(passController, 'Senha', Icons.lock_outline, obscureText: true),
-        _buildTextField(confirmPassController, 'Confirmar senha', Icons.lock_outline, obscureText: true),
+        _buildTextField(nameController, 'Nome', Icons.person),
+        _buildTextField(emailController, 'E-mail', Icons.email, textType: TextInputType.emailAddress),
+        _buildPasswordField(passController, 'Senha'),
+        _buildPasswordField(confirmPassController, 'Confirmar senha'),
         _buildRegisterButton(context),
         _buildBackButton(context),
       ],

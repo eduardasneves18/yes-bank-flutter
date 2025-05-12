@@ -5,12 +5,13 @@ import 'package:yes_bank/components/fields/yb_text_field.dart';
 import '../../components/fields/yb_number_field.dart';
 import '../../components/screens/yb_app_bar.dart';
 import '../../components/fields/yb_date_field.dart';
-import '../../database/firebase_database.dart';
+import '../../services/firebase.dart';
+import '../../services/firebase/transactions/transactions_firebase.dart';
 
 final TextEditingController _destinatarioController = TextEditingController();
 final TextEditingController _valorController = TextEditingController();
 final TextEditingController _dataController = TextEditingController();
-final FirebaseService _firebaseService = FirebaseService();
+final TransactionsFirebaseService _firebaseService = TransactionsFirebaseService();
 
 class Transaction extends StatefulWidget {
   @override
@@ -135,7 +136,6 @@ class _TransactionState extends State<Transaction> {
                     }
 
                     try {
-                      // Convertendo valorTransacao para double
                       double valor = double.tryParse(valorTransacao) ?? 0.0;
                       if (valor == 0.0) {
                         DialogMessage.showMessage(
