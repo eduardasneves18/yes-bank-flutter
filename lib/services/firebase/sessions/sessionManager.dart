@@ -1,8 +1,8 @@
 import 'dart:async';
-
 import '../../../models/cliente.dart';
 import '../../../store/cliente_store.dart';
-import '../login/login_firebase.dart';
+import '../../../services/firebase/login/login_firebase.dart';
+import '../../../services/cache/transaction_cache_service.dart';
 
 class SessionManager {
   static const Duration sessionTimeout = Duration(minutes: 10);
@@ -11,37 +11,39 @@ class SessionManager {
   final LoginFirebaseAuthService _authService;
   final Cliente _user;
   final ClienteStore _clienteStore;
+  final TransactionCacheService _cacheService = TransactionCacheService();
 
   SessionManager(this._authService, this._user, this._clienteStore) {
-    startSessionTimer();
+    _startSessionTimer();
+    _setUser();
   }
 
-  void _defineUser() {
-    _clienteStore.defineCliente(_user);
-  }
-
-  void _cleanUser() {
-    _clienteStore.removeCliente();
-  }
-
-  void startSessionTimer() {
+  void _startSessionTimer() {
     _sessionTimer?.cancel();
     _sessionTimer = Timer(sessionTimeout, _handleSessionTimeout);
-    _defineUser();
   }
 
   void resetSessionTimer() {
-    startSessionTimer();
+    _startSessionTimer();
   }
 
-  void _handleSessionTimeout() {
-    logout();
+  void _setUser() {
+    _clienteStore.defineCliente(_user);
+  }
+
+  void _clearUser() {
+    _clienteStore.removeCliente();
+  }
+
+  Future<void> _handleSessionTimeout() async {
+    await logout();
   }
 
   Future<void> logout() async {
     _sessionTimer?.cancel();
-    await _authService.signOut();
-    _cleanUser();
+    await _authService.signOut();// Limpa autenticação
+    _clearUser();// Limpa dados locais
+    await _cacheService.clearCache(); // limpa cache
   }
 
   void dispose() {

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:yes_bank/components/dialogs/yb_dialog_message.dart';
-import 'package:yes_bank/services/firebase.dart';
 import 'package:yes_bank/screens/transactions/edit_transaction.dart';
 
 import '../../components/filters/yb_transactions_filter.dart';
 import '../../components/screens/yb_app_bar.dart';
 import '../../components/yb_menu.dart';
+import '../../services/cache/transaction_cache_service.dart';
 import '../../services/firebase/transactions/transactions_firebase.dart';
 
 class ListTransactions extends StatefulWidget {
@@ -16,6 +16,8 @@ class ListTransactions extends StatefulWidget {
 
 class _ListTransactionsState extends State<ListTransactions> {
   final TransactionsFirebaseService _firebaseService = TransactionsFirebaseService();
+  final TransactionCacheService _cacheService = TransactionCacheService();
+
   List<Map<String, dynamic>> _transactions = [];
   List<Map<String, dynamic>> _filteredTransactions = [];
   bool _isLoading = true;
@@ -29,16 +31,29 @@ class _ListTransactionsState extends State<ListTransactions> {
   @override
   void initState() {
     super.initState();
-    _loadTransactions();
+    _initializeTransactions();
     _scrollController.addListener(_scrollListener);
+  }
+
+  Future<void> _initializeTransactions() async {
+    final cachedTransactions = await _cacheService.getTransactions();
+    if (!mounted) return;
+
+    if (cachedTransactions.isNotEmpty) {
+      setState(() {
+        _transactions = cachedTransactions;
+        _isLoading = false;
+      });
+    } else {
+      await _loadTransactions();
+    }
   }
 
   Future<void> _loadTransactions() async {
     if (_isFetchingMore) return;
 
-    if (!mounted) return;
     setState(() {
-      _isLoading = true;
+      _isFetchingMore = true;
     });
 
     try {
@@ -50,38 +65,37 @@ class _ListTransactionsState extends State<ListTransactions> {
         );
 
         if (!mounted) return;
-        setState(() {
-          if (transactions.isNotEmpty) {
-            _lastTransactionId = transactions.last['transactionId'];
-            _transactions.addAll(transactions);
-          }
-          _isLoading = false;
-        });
-      } else {
-        if (!mounted) return;
-        setState(() {
-          _isLoading = false;
-        });
 
-        if (!mounted) return;
-         DialogMessage.showMessage(
+        if (transactions.isNotEmpty) {
+          setState(() {
+            _lastTransactionId = transactions.last['transactionId'];
+
+            final newTransactionIds = transactions.map((t) => t['transactionId']).toSet();
+            _transactions.removeWhere((t) => newTransactionIds.contains(t['transactionId']));
+            _transactions.addAll(transactions);
+          });
+
+          await _cacheService.saveTransactions(_transactions);
+        }
+      } else {
+        DialogMessage.showMessage(
           context: context,
           title: 'Erro',
           message: 'Usuário não autenticado. Por favor, faça login novamente.',
         );
       }
     } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-      });
-
-      if (!mounted) return;
       await DialogMessage.showMessage(
         context: context,
         title: 'Erro',
         message: 'Falha ao carregar transações. Tente novamente.',
       );
+    } finally {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _isFetchingMore = false;
+      });
     }
   }
 
@@ -124,17 +138,34 @@ class _ListTransactionsState extends State<ListTransactions> {
     );
   }
 
-  void _editTransaction(Map<String, dynamic> transaction) {
-    Navigator.push(
+  Future<void> _editTransaction(Map<String, dynamic> transaction) async {
+    final updatedTransaction = await Navigator.push<Map<String, dynamic>>(
       context,
-      MaterialPageRoute(builder: (context) => EditTransaction(transaction: transaction)),
+      MaterialPageRoute(
+        builder: (context) => EditTransaction(transaction: transaction),
+      ),
     );
+
+    if (updatedTransaction != null) {
+      final index = _transactions.indexWhere((t) => t['transactionId'] == updatedTransaction['transactionId']);
+      if (index != -1) {
+        setState(() {
+          _transactions[index] = updatedTransaction;
+        });
+        await _cacheService.saveTransactions(_transactions);
+      }
+    }
   }
 
   Future<void> _deleteTransaction(Map<String, dynamic> transaction) async {
     try {
       await _firebaseService.deleteTransaction(transaction['transactionId']);
-      await _loadTransactions();
+
+      setState(() {
+        _transactions.removeWhere((t) => t['transactionId'] == transaction['transactionId']);
+      });
+
+      await _cacheService.saveTransactions(_transactions);
 
       if (!mounted) return;
       await DialogMessage.showMessage(
@@ -186,6 +217,8 @@ class _ListTransactionsState extends State<ListTransactions> {
   Widget build(BuildContext context) {
     final MediaQueryData data = MediaQuery.of(context);
     final Size sizeScreen = data.size;
+
+    final displayedTransactions = _isFiltering ? _filteredTransactions : _transactions;
 
     return Scaffold(
       appBar: CustomAppBar(),
@@ -245,25 +278,16 @@ class _ListTransactionsState extends State<ListTransactions> {
               ),
               child: _isLoading && _transactions.isEmpty
                   ? Center(child: CircularProgressIndicator())
-                  : _filteredTransactions.isEmpty && _transactions.isEmpty
+                  : displayedTransactions.isEmpty
                   ? Center(child: Text('Não há transações para exibir.'))
                   : ListView.builder(
                 controller: _scrollController,
-                itemCount: (_filteredTransactions.isEmpty
-                    ? _transactions
-                    : _filteredTransactions)
-                    .length +
-                    (_isFetchingMore ? 1 : 0),
+                itemCount: displayedTransactions.length + (_isFetchingMore ? 1 : 0),
                 itemBuilder: (context, index) {
-                  if (index ==
-                      (_filteredTransactions.isEmpty
-                          ? _transactions
-                          : _filteredTransactions).length) {
+                  if (index == displayedTransactions.length) {
                     return Center(child: CircularProgressIndicator());
                   }
-                  var transaction = (_filteredTransactions.isEmpty
-                      ? _transactions
-                      : _filteredTransactions)[index];
+                  var transaction = displayedTransactions[index];
                   return Card(
                     color: Colors.transparent,
                     margin: EdgeInsets.all(10),

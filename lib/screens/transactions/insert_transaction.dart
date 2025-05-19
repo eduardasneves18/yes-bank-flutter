@@ -5,7 +5,7 @@ import 'package:yes_bank/components/fields/yb_text_field.dart';
 import '../../components/fields/yb_number_field.dart';
 import '../../components/screens/yb_app_bar.dart';
 import '../../components/fields/yb_date_field.dart';
-import '../../services/firebase.dart';
+import '../../services/firebase/firebase.dart';
 import '../../services/firebase/transactions/transactions_firebase.dart';
 
 final TextEditingController _destinatarioController = TextEditingController();

@@ -23,12 +23,9 @@ android {
     }
 
     defaultConfig {
-        // TODO: Especifique seu próprio ID único da aplicação (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.yes_bank"
-        // Você pode atualizar os seguintes valores para corresponder às necessidades do seu aplicativo.
-        // Mais informações: https://flutter.dev/docs/release/build
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdkVersion(23)
+        targetSdkVersion(33)
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

@@ -6,7 +6,7 @@ import '../../components/fields/yb_number_field.dart';
 import '../../components/fields/yb_text_field.dart';
 import '../../components/fields/yb_dropdown_field.dart';
 import '../../components/screens/yb_app_bar.dart';
-import '../../services/firebase.dart';
+import '../../services/firebase/firebase.dart';
 import '../../services/firebase/transactions/transactions_firebase.dart';
 import 'list_transactions.dart';
 
@@ -167,14 +167,19 @@ class _EditTransactionState extends State<EditTransaction> {
                         },
                       );
 
-                      DialogMessage.showMessage(
-                        context: context,
-                        title: 'Sucesso',
-                        message: 'Sua transação foi atualizada.',
-                      );
+                      // DialogMessage.showMessage(
+                      //   context: context,
+                      //   title: 'Sucesso',
+                      //   message: 'Sua transação foi atualizada.',
+                      // );
 
-                      // Retorna para a tela anterior após atualização
-                      Navigator.pop(context);
+                      Navigator.pop(context, {
+                        'transactionId': widget.transaction['transactionId'],
+                        'destinatario': destinatarioTransacao,
+                        'tipo_transacao': tipoTransacao,
+                        'valor': valor,
+                        'data': dataTransacao,
+                      });
                     } catch (e) {
                       DialogMessage.showMessage(
                         context: context,

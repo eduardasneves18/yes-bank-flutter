@@ -1,21 +1,21 @@
 # Yes-Bank (Flutter)
-Yes-Bank é um aplicativo bancário simulado desenvolvido em Flutter para dispositivos móveis. O app permite que os usuários registrem transações e consultem o extrato de suas operações. O sistema foi projetado para simular uma experiência de banco digital/ aplicativo de gestão financeira, com foco em simplicidade e nas funcionalidades essenciais para o gerenciamento de suas finanças.
+Yes-Bank é um aplicativo de gestão financeira simulado desenvolvido em Flutter para dispositivos móveis. O app permite que os usuários registrem transações e consultem o extrato de suas operações. O sistema foi projetado para simular uma experiência de banco digital/ aplicativo de gestão financeira, com foco em simplicidade e nas funcionalidades essenciais para o gerenciamento de suas finanças.
 
 ## Funcionalidades
-Visualização de Conta Bancária: O usuário pode verificar o saldo atual da sua conta bancária com base nas transações registradas.
-
 Transações: Permite reegistrar transações.
 
-Extrato Bancário: O usuário pode consultar o histórico de transações realizadas.
+Extrato de transações: O usuário pode consultar o histórico de transações realizadas.
 
 ## Tecnologias Utilizadas
-Flutter: Framework da Google para desenvolvimento de aplicações móveis multiplataforma.
+Framework: Flutter.
 
-Dart: Linguagem de programação utilizada no Flutter.
+Linguagem de programação: Dart.
 
-Provider / MobX: Gerenciamento de estado.
+Gerenciamento de estado: Provider / MobX.
 
-Local Storage: Armazenamento e manipulação de dados simulados.
+Armazenamento e manipulação de dados simulados: Local Storage.
+
+Cache: shaed_preference.
 
 ## Pré-requisitos
 Antes de rodar o projeto, é necessário ter o Flutter instalado. Siga as instruções na documentação oficial:
