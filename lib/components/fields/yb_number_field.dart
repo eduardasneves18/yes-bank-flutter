@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -15,6 +16,7 @@ class YBNumberField extends StatefulWidget {
   final String? labelText;
   final Color? labelColor;
   final TextEditingController controller;
+  final Function(String)? onChanged;
 
   const YBNumberField({
     Key? key,
@@ -31,6 +33,7 @@ class YBNumberField extends StatefulWidget {
     this.labelText,
     this.labelColor,
     required this.controller,
+    this.onChanged,
   }) : super(key: key);
 
   @override
@@ -82,18 +85,15 @@ class _YBNumberFieldState extends State<YBNumberField> {
           hintStyle: _hintStyle,
           hintText: widget.hint,
           fillColor: widget.fillColor ?? Colors.white,
-          prefixIcon: Icon(
-            widget.icon,
-            color: _iconColor,
-            size: _widthScreen * 0.06,
-          ),
+          prefixIcon: widget.icon != null
+              ? Icon(widget.icon, color: _iconColor, size: _widthScreen * 0.06)
+              : null,
           contentPadding: EdgeInsets.symmetric(horizontal: _widthScreen * 0.02),
         ),
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
         ],
-        onChanged: (value) {
-        },
+        onChanged: widget.onChanged,
       ),
     );
   }

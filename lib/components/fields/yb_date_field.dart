@@ -1,5 +1,7 @@
+import 'dart:ui';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class YBDateField extends StatefulWidget {
@@ -16,6 +18,7 @@ class YBDateField extends StatefulWidget {
   final String? labelText;
   final Color? labelColor;
   final TextEditingController controller;
+  final ValueChanged<DateTime>? onDateSelected;
 
   const YBDateField({
     Key? key,
@@ -32,6 +35,7 @@ class YBDateField extends StatefulWidget {
     this.labelText,
     this.labelColor,
     required this.controller,
+    this.onDateSelected,
   }) : super(key: key);
 
   @override
@@ -41,28 +45,30 @@ class YBDateField extends StatefulWidget {
 class _YBDateFieldState extends State<YBDateField> {
   TextEditingController get controller => widget.controller;
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      controller.text = DateFormat('dd/MM/yyyy').format(picked);
+      if (widget.onDateSelected != null) {
+        widget.onDateSelected!(picked);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final widthScreen = widget.sizeScreen.width;
     final Color _borderColor = widget.borderColor ?? Theme.of(context).primaryColor;
     final Color? textColor = widget.textColor ?? Theme.of(context).primaryColor;
     final Color? cursorColor = widget.cursorColor ?? Theme.of(context).primaryColor;
-
     final TextInputType keyboardType = widget.textType ?? TextInputType.datetime;
     final TextStyle hintStyle = TextStyle(color: widget.hintColor ?? Colors.grey[500]);
     final Color? iconColor = widget.iconColor ?? Colors.grey[500];
-
-    Future<void> _selectDate(BuildContext context) async {
-      final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        firstDate: DateTime(1900),
-        lastDate: DateTime(2101),
-      );
-      if (picked != null && picked != DateTime.now()) {
-        controller.text = DateFormat('dd/MM/yyyy').format(picked);
-      }
-    }
 
     return Container(
       height: widthScreen * 0.14,
@@ -77,14 +83,13 @@ class _YBDateFieldState extends State<YBDateField> {
         enableInteractiveSelection: true,
         cursorColor: cursorColor,
         keyboardType: keyboardType,
+        readOnly: true,
+        onTap: () => _selectDate(context),
         decoration: InputDecoration(
           labelText: widget.labelText,
           labelStyle: TextStyle(color: widget.labelColor ?? Colors.black),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: _borderColor,
-              width: (1),
-            ),
+            borderSide: BorderSide(color: _borderColor, width: 1),
             borderRadius: const BorderRadius.all(Radius.circular(8.0)),
           ),
           border: OutlineInputBorder(
@@ -95,11 +100,9 @@ class _YBDateFieldState extends State<YBDateField> {
           hintStyle: hintStyle,
           hintText: widget.hint,
           fillColor: widget.fillColor ?? Colors.white,
-          prefixIcon: Icon(
-            widget.icon,
-            color: iconColor,
-            size: widthScreen * 0.06,
-          ),
+          prefixIcon: widget.icon != null
+              ? Icon(widget.icon, color: iconColor, size: widthScreen * 0.06)
+              : null,
           suffixIcon: IconButton(
             icon: Icon(Icons.calendar_month),
             color: iconColor,
@@ -107,23 +110,6 @@ class _YBDateFieldState extends State<YBDateField> {
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: widthScreen * 0.02),
         ),
-        inputFormatters: [
-          FilteringTextInputFormatter.digitsOnly,
-          TextInputFormatter.withFunction((oldValue, newValue) {
-            String text = newValue.text;
-            if (text.length == 2 || text.length == 5) {
-              text = '${text.substring(0, 2)}/${text.substring(3)}';
-              return newValue.copyWith(text: text, selection: TextSelection.collapsed(offset: text.length));
-            }
-            return newValue;
-          }),
-        ],
-        onChanged: (value) {
-          if (value.length == 2 || value.length == 5) {
-            controller.text = '${value.substring(0, 2)}/${value.substring(3)}';
-            controller.selection = TextSelection.collapsed(offset: controller.text.length);
-          }
-        },
       ),
     );
   }

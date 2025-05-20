@@ -5,6 +5,7 @@ class DialogMessage {
     required BuildContext context,
     required String title,
     required String message,
+    VoidCallback? onConfirmed, // <-- Optional callback
   }) {
     return showDialog<void>(
       barrierDismissible: false,
@@ -27,6 +28,7 @@ class DialogMessage {
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
+              onConfirmed!();
             },
             child: Text(
               'OK',

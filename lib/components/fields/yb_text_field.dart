@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class YBTextField extends StatefulWidget {
@@ -15,6 +16,7 @@ class YBTextField extends StatefulWidget {
   final String? labelText;
   final Color? labelColor;
   final TextEditingController controller;
+  final ValueChanged<String>? onChanged;
 
   const YBTextField({
     Key? key,
@@ -32,6 +34,7 @@ class YBTextField extends StatefulWidget {
     this.labelText,
     this.labelColor,
     required this.controller,
+    this.onChanged,
   }) : super(key: key);
 
   @override
@@ -41,12 +44,12 @@ class YBTextField extends StatefulWidget {
 class _YBTextFieldState extends State<YBTextField> {
   bool showSecurityPassword = true;
 
+  @override
   Widget build(BuildContext context) {
     final _widthScreen = widget.sizeScreen.width;
     final Color _borderColor = widget.borderColor ?? Theme.of(context).primaryColor;
     final Color? _textColor = widget.textColor ?? Theme.of(context).primaryColor;
     final Color? _cursorColor = widget.cursorColor ?? Theme.of(context).primaryColor;
-
     final TextInputType? _keyboardType = widget.textType ?? TextInputType.text;
     final TextStyle _hintStyle = TextStyle(color: widget.hintColor ?? Colors.grey[500]);
     final Color? _iconColor = widget.iconColor ?? Colors.grey[500];
@@ -64,19 +67,19 @@ class _YBTextFieldState extends State<YBTextField> {
         enableInteractiveSelection: true,
         cursorColor: _cursorColor,
         keyboardType: _keyboardType,
+        onChanged: widget.onChanged,
         decoration: InputDecoration(
           labelText: widget.labelText,
           labelStyle: TextStyle(color: widget.labelColor ?? Colors.black),
           enabledBorder: OutlineInputBorder(
             borderSide: BorderSide(
               color: _borderColor,
-              width: (1),
+              width: 1,
             ),
             borderRadius: const BorderRadius.all(Radius.circular(8.0)),
           ),
           border: OutlineInputBorder(
-            borderSide: BorderSide(
-                color: _borderColor),
+            borderSide: BorderSide(color: _borderColor),
             borderRadius: const BorderRadius.all(Radius.circular(8.0)),
           ),
           filled: true,
@@ -85,7 +88,8 @@ class _YBTextFieldState extends State<YBTextField> {
           fillColor: widget.fillColor ?? Colors.white,
           prefixIcon: widget.icon != null
               ? Icon(widget.icon, color: _iconColor, size: _widthScreen * 0.06)
-              : null,)
+              : null,
+        ),
       ),
     );
   }

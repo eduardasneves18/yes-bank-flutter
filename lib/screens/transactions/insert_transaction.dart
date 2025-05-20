@@ -67,14 +67,13 @@ class _TransactionState extends State<Transaction> {
                     });
                   },
                   sizeScreen: sizeScreen,
-                  hint: '---',
-                  fieldBackgroundColor: Colors.transparent,
-                  menuBackgroundColor: Colors.black,
+                  hint: 'Teste',
                   borderColor: Colors.black,
-                  textColor: Colors.grey,
-                  fillColor: Colors.transparent,
+                  textColor: Colors.black,
+                  fillColor: Colors.white,
                   labelColor: Colors.white,
                   labelText: 'Tipo de transação',
+                  dropdownColor: Colors.white,
                 ),
                 YBNumberField(
                   controller: _valorController,

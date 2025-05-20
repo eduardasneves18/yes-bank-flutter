@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:yes_bank/components/fields/yb_date_field.dart';
+import 'package:yes_bank/components/fields/yb_number_field.dart';
+import 'package:yes_bank/components/fields/yb_text_field.dart';
 import 'package:yes_bank/components/fields/yb_dropdown_field.dart';
 import '../../services/firebase/firebase.dart';
 import '../../services/firebase/transactions/transactions_firebase.dart';
@@ -18,6 +21,7 @@ class _YbTransactionsFilterState extends State<YbTransactionsFilter> {
   String? _selectedDestinatario;
   double? _selectedValor;
   DateTime? _selectedData;
+  BuildContext? _context;
 
   final _destinatarioController = TextEditingController();
   final _valorController = TextEditingController();
@@ -28,7 +32,7 @@ class _YbTransactionsFilterState extends State<YbTransactionsFilter> {
 
     String? destinatario = _selectedDestinatario?.isEmpty ?? true ? null : _selectedDestinatario;
     double? valor = _selectedValor == null || _selectedValor == 0 ? null : _selectedValor;
-    String? data = _selectedData == null ? null : DateFormat('dd/MM/yyy').format(_selectedData!);
+    String? data = _selectedData == null ? null : DateFormat('dd/MM/yyyy').format(_selectedData!);
 
     firebaseService.getTransactionsFiltered(
       tipoTransacao: _selectedTipoTransacao,
@@ -37,12 +41,15 @@ class _YbTransactionsFilterState extends State<YbTransactionsFilter> {
       data: data,
     ).then((transactions) {
       widget.onFilterApplied(transactions);
-      Navigator.pop(context);
+      Navigator.pop(_context!);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final Size size = MediaQuery.of(context).size;
+    _context = context;
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18.0),
@@ -53,72 +60,72 @@ class _YbTransactionsFilterState extends State<YbTransactionsFilter> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(child: Text("Filtro de transações", style: TextStyle(fontSize: 20))),
+              Center(
+                  child: Text("Filtro de transações", style: TextStyle(fontSize: 20))),
               SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: TextField(
-                  controller: _destinatarioController,
-                  decoration: InputDecoration(labelText: 'Destinatário'),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedDestinatario = value;
-                    });
-                  },
-                ),
+              YBTextField(
+                sizeScreen: size,
+                controller: _destinatarioController,
+                hint: 'Digite o destinatário',
+                labelText: 'Destinatário',
+                borderColor: Colors.black,
+                textColor: Colors.black,
+                fillColor: Colors.white,
+                labelColor: Colors.black,
+                onChanged: (value) {
+                  setState(() {
+                    _selectedDestinatario = value;
+                  });
+                },
               ),
-              SizedBox(height: 8),
               YBDropdownField(
                 onChanged: (value) {
                   setState(() {
                     _selectedTipoTransacao = value;
-                  })
-                  ;
+                  });
                 },
                 hint: 'Tipo transação',
                 borderColor: Colors.black,
                 textColor: Colors.black,
                 fillColor: Colors.transparent,
-                labelColor: Colors.white,
+                labelColor: Colors.black,
                 labelText: 'Tipo transação',
+                sizeScreen: size,
+                iconColor: Colors.black,
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: TextField(
-                  controller: _valorController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: 'Valor'),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedValor = value.isEmpty ? null : double.tryParse(value);
-                    });
-                  },
-                ),
+
+              // Valor
+              YBNumberField(
+                sizeScreen: size,
+                controller: _valorController,
+                hint: 'Digite o valor',
+                labelText: 'Valor',
+                borderColor: Colors.black,
+                textColor: Colors.black,
+                fillColor: Colors.white,
+                labelColor: Colors.black,
+                onChanged: (value) {
+                  setState(() {
+                    _selectedValor =
+                    value.isEmpty ? null : double.tryParse(value);
+                  });
+                },
               ),
-              SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: TextField(
-                  controller: _dataController,
-                  readOnly: true,
-                  decoration: InputDecoration(labelText: 'Data'),
-                  onTap: () async {
-                    DateTime? pickedDate = await showDatePicker(
-                      context: context,
-                      initialDate: _selectedData ?? DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2101),
-                    );
-                    if (pickedDate != null && pickedDate != _selectedData) {
-                      setState(() {
-                        _selectedData = pickedDate;
-                        _dataController.text = DateFormat('dd/MM/yyyy').format(pickedDate);
-                      });
-                    }
-                  },
-                ),
+
+              // Data
+              YBDateField(
+                sizeScreen: size,
+                controller: _dataController,
+                hint: 'Selecione a data',
+                labelText: 'Data',
+                borderColor: Colors.black,
+                textColor: Colors.black,
+                fillColor: Colors.white,
+                labelColor: Colors.black,
               ),
+
               SizedBox(height: 16),
+
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(

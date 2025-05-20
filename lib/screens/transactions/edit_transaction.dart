@@ -24,7 +24,7 @@ class _EditTransactionState extends State<EditTransaction> {
   final TextEditingController _tipoTransacaoController = TextEditingController();
   final TextEditingController _valorController = TextEditingController();
   final TextEditingController _dataController = TextEditingController();
-
+  BuildContext? _context;
   String? _selectedTipoTransacao;
   final TransactionsFirebaseService _firebaseService = TransactionsFirebaseService();
 
@@ -41,7 +41,7 @@ class _EditTransactionState extends State<EditTransaction> {
   Widget build(BuildContext context) {
     final MediaQueryData data = MediaQuery.of(context);
     final Size sizeScreen = data.size;
-
+    _context = context;
     return ComponenteGeral(
       sizeScreen: sizeScreen,
       child: SingleChildScrollView(
@@ -82,14 +82,13 @@ class _EditTransactionState extends State<EditTransaction> {
                   },
                   sizeScreen: sizeScreen,
                   hint: '---',
-                  labelText: 'Tipo de transação',
-                  labelColor: Colors.white,
-                  fieldBackgroundColor: Colors.transparent,
-                  menuBackgroundColor: Colors.black,
                   borderColor: Colors.black,
                   textColor: Colors.grey,
-                  fillColor: Colors.transparent,
+                  fillColor: Colors.transparent, // fundo do campo
+                  labelColor: Colors.white,
+                  labelText: 'Tipo de transação',
                 ),
+
                 YBNumberField(
                   controller: _valorController,
                   sizeScreen: sizeScreen,
@@ -138,7 +137,7 @@ class _EditTransactionState extends State<EditTransaction> {
 
                     if (destinatarioTransacao.isEmpty || tipoTransacao.isEmpty || valorTransacao.isEmpty || dataTransacao.isEmpty) {
                       DialogMessage.showMessage(
-                        context: context,
+                        context: _context!,
                         title: 'Erro',
                         message: 'Por favor, preencha todos os campos.',
                       );
@@ -149,7 +148,7 @@ class _EditTransactionState extends State<EditTransaction> {
                       double valor = double.tryParse(valorTransacao) ?? 0.0;
                       if (valor == 0.0) {
                         DialogMessage.showMessage(
-                          context: context,
+                          context: _context!,
                           title: 'Erro',
                           message: 'Valor inválido. Tente novamente.',
                         );
@@ -167,22 +166,26 @@ class _EditTransactionState extends State<EditTransaction> {
                         },
                       );
 
-                      // DialogMessage.showMessage(
-                      //   context: context,
-                      //   title: 'Sucesso',
-                      //   message: 'Sua transação foi atualizada.',
-                      // );
+                      DialogMessage.showMessage(
+                        context: _context!,
+                        title: 'Sucesso',
+                        message: 'Sua transação foi atualizada.',
+                        onConfirmed: () {
+                          Future.delayed(Duration(milliseconds: 300), () {
+                            Navigator.pop(_context!, {
+                              'transactionId': widget.transaction['transactionId'],
+                              'destinatario': destinatarioTransacao,
+                              'tipo_transacao': tipoTransacao,
+                              'valor': valor,
+                              'data': dataTransacao,
+                            });
+                          });
+                        },
+                      );
 
-                      Navigator.pop(context, {
-                        'transactionId': widget.transaction['transactionId'],
-                        'destinatario': destinatarioTransacao,
-                        'tipo_transacao': tipoTransacao,
-                        'valor': valor,
-                        'data': dataTransacao,
-                      });
                     } catch (e) {
                       DialogMessage.showMessage(
-                        context: context,
+                        context: _context!,
                         title: 'Erro',
                         message: 'Falha ao atualizar transação. Tente novamente.',
                       );
