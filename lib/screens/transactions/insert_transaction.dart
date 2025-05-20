@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:yes_bank/components/dialogs/yb_dialog_message.dart';
 import 'package:yes_bank/components/fields/yb_dropdown_field.dart';
 import 'package:yes_bank/components/fields/yb_text_field.dart';
+import 'package:yes_bank/screens/transactions/list_transactions.dart';
 import '../../components/fields/yb_number_field.dart';
 import '../../components/screens/yb_app_bar.dart';
 import '../../components/fields/yb_date_field.dart';
-import '../../services/firebase/firebase.dart';
 import '../../services/firebase/transactions/transactions_firebase.dart';
 
 final TextEditingController _destinatarioController = TextEditingController();
@@ -20,17 +20,20 @@ class Transaction extends StatefulWidget {
 
 class _TransactionState extends State<Transaction> {
   String? _selectedTipoTransacao;
+  BuildContext? _context;
+
 
   @override
   Widget build(BuildContext context) {
     final MediaQueryData data = MediaQuery.of(context);
     final Size sizeScreen = data.size;
+    _context = context;
 
     return ComponenteGeral(
       sizeScreen: sizeScreen,
       child: SingleChildScrollView(
         child: Column(
-          children: [
+          children: <Widget> [
             Container(
               alignment: Alignment.topLeft,
               child: Row(
@@ -67,13 +70,13 @@ class _TransactionState extends State<Transaction> {
                     });
                   },
                   sizeScreen: sizeScreen,
-                  hint: 'Teste',
+                  hint: '---',
+                  dropdownColor: Colors.black,
                   borderColor: Colors.black,
-                  textColor: Colors.black,
-                  fillColor: Colors.white,
+                  textColor: Colors.grey,
+                  fillColor: Colors.transparent,
                   labelColor: Colors.white,
                   labelText: 'Tipo de transação',
-                  dropdownColor: Colors.white,
                 ),
                 YBNumberField(
                   controller: _valorController,
@@ -149,14 +152,19 @@ class _TransactionState extends State<Transaction> {
                         destinatarioTransacao,
                         tipoTransacao,
                         valor,
-                        dataTransacao,
+                        dataTransacao
                       );
                       DialogMessage.showMessage(
                         context: context,
                         title: 'Sucesso',
                         message: 'Sua transação foi realizada.',
+                        onConfirmed: ()  {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => ListTransactions()),
+                            );
+                          },
                       );
-
 
                     } catch (e) {
                       DialogMessage.showMessage(

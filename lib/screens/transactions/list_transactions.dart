@@ -120,7 +120,7 @@ class _ListTransactionsState extends State<ListTransactions> {
                 title: Text('Alterar Transação'),
                 onTap: () {
                   Navigator.pop(context);
-                  _editTransaction(transaction);
+                  _editTransaction(transaction, _transactions);
                 },
               ),
               ListTile(
@@ -128,7 +128,7 @@ class _ListTransactionsState extends State<ListTransactions> {
                 title: Text('Deletar Transação'),
                 onTap: () {
                   Navigator.pop(context);
-                  _deleteTransaction(transaction);
+                  _deleteTransaction(transaction, _transactions);
                 },
               ),
             ],
@@ -138,41 +138,26 @@ class _ListTransactionsState extends State<ListTransactions> {
     );
   }
 
-  Future<void> _editTransaction(Map<String, dynamic> transaction) async {
+  Future<void> _editTransaction(Map<String, dynamic> transaction, _transactions) async {
     final updatedTransaction = await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
-        builder: (context) => EditTransaction(transaction: transaction),
+        builder: (context) => EditTransaction(transaction: transaction, transactions: _transactions),
       ),
     );
-
-    if (updatedTransaction != null) {
-      final index = _transactions.indexWhere((t) => t['transactionId'] == updatedTransaction['transactionId']);
-      if (index != -1) {
-        setState(() {
-          _transactions[index] = updatedTransaction;
-        });
-        await _cacheService.saveTransactions(_transactions);
-      }
-    }
   }
 
-  Future<void> _deleteTransaction(Map<String, dynamic> transaction) async {
+  Future<void> _deleteTransaction(Map<String, dynamic> transaction, List<Map<String, dynamic>> transactions) async {
     try {
-      await _firebaseService.deleteTransaction(transaction['transactionId']);
-
-      setState(() {
-        _transactions.removeWhere((t) => t['transactionId'] == transaction['transactionId']);
-      });
-
-      await _cacheService.saveTransactions(_transactions);
-
+      await _firebaseService.deleteTransaction(transaction['transactionId'],_transactions,);
       if (!mounted) return;
       await DialogMessage.showMessage(
         context: context,
         title: 'Sucesso',
         message: 'Transação deletada!',
+        onConfirmed: () { _initializeTransactions();}
       );
+
     } catch (e) {
       if (!mounted) return;
       await DialogMessage.showMessage(

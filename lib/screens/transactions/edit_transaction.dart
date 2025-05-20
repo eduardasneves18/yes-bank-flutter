@@ -12,8 +12,9 @@ import 'list_transactions.dart';
 
 class EditTransaction extends StatefulWidget {
   final Map<String, dynamic> transaction;
+  final List<Map<String, dynamic>> transactions;
 
-  EditTransaction({required this.transaction});
+  EditTransaction({required this.transaction, required this.transactions});
 
   @override
   _EditTransactionState createState() => _EditTransactionState();
@@ -21,7 +22,6 @@ class EditTransaction extends StatefulWidget {
 
 class _EditTransactionState extends State<EditTransaction> {
   final TextEditingController _destinatarioController = TextEditingController();
-  final TextEditingController _tipoTransacaoController = TextEditingController();
   final TextEditingController _valorController = TextEditingController();
   final TextEditingController _dataController = TextEditingController();
   BuildContext? _context;
@@ -84,7 +84,7 @@ class _EditTransactionState extends State<EditTransaction> {
                   hint: '---',
                   borderColor: Colors.black,
                   textColor: Colors.grey,
-                  fillColor: Colors.transparent, // fundo do campo
+                  fillColor: Colors.transparent,
                   labelColor: Colors.white,
                   labelText: 'Tipo de transação',
                 ),
@@ -155,15 +155,16 @@ class _EditTransactionState extends State<EditTransaction> {
                         return;
                       }
 
-                      // Atualiza a transação no Firebase
                       await _firebaseService.updateTransaction(
                         widget.transaction['transactionId'],
                         {
+                          'transactionId': widget.transaction['transactionId'],
                           'destinatario': destinatarioTransacao,
                           'tipo_transacao': tipoTransacao,
                           'valor': valor,
                           'data': dataTransacao,
                         },
+                        widget.transactions,
                       );
 
                       DialogMessage.showMessage(
@@ -171,15 +172,10 @@ class _EditTransactionState extends State<EditTransaction> {
                         title: 'Sucesso',
                         message: 'Sua transação foi atualizada.',
                         onConfirmed: () {
-                          Future.delayed(Duration(milliseconds: 300), () {
-                            Navigator.pop(_context!, {
-                              'transactionId': widget.transaction['transactionId'],
-                              'destinatario': destinatarioTransacao,
-                              'tipo_transacao': tipoTransacao,
-                              'valor': valor,
-                              'data': dataTransacao,
-                            });
-                          });
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => ListTransactions()),
+                          );
                         },
                       );
 

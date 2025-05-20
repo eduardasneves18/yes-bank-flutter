@@ -41,9 +41,9 @@ class SessionManager {
 
   Future<void> logout() async {
     _sessionTimer?.cancel();
-    await _authService.signOut();// Limpa autenticação
-    _clearUser();// Limpa dados locais
-    await _cacheService.clearCache(); // limpa cache
+    await _authService.signOut();
+    _clearUser();
+    await _cacheService.clearCache();
   }
 
   void dispose() {

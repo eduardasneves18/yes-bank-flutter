@@ -11,10 +11,12 @@ dependencies:
   flutter:
     sdk: flutter
   provider: ^6.0.0
+  skeletonizer: ^1.4.3
   mobx: ^2.0.0
   sqflite: ^2.0.0+3
   flutter_localizations:
     sdk: flutter
+  cloud_firestore: ^5.0.0
   device_preview: ^1.2.0 # Atualizado para a versão 1.2.0 ou superior, compatível com provider 6.x.x
 
   # Dependência para os ícones Cupertino

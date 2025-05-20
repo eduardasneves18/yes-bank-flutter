@@ -1,11 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:intl/intl.dart';
+import '../../cache/transaction_cache_service.dart';
 import '../firebase.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TransactionsFirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseServiceGeneric _firebaseService = FirebaseServiceGeneric();
+  final TransactionCacheService _cacheService = TransactionCacheService();
 
   String _lastTransactionId = "";
   int startAt = 0;
@@ -13,11 +16,16 @@ class TransactionsFirebaseService {
   bool executeSublist = false;
 
   Future<void> createTransaction(
-      String destinatario, String tipoTransacao, double valor, String data) async {
+      String destinatario,
+      String tipoTransacao,
+      double valor,
+      String data,
+      ) async {
     try {
       User? user = _auth.currentUser;
       if (user == null) throw Exception('Nenhum usuário autenticado');
 
+      List<Map<String, dynamic>> transactions = [];
       String userId = user.uid;
 
       await _firebaseService.create('transacoes', {
@@ -27,10 +35,21 @@ class TransactionsFirebaseService {
         'valor': valor,
         'data': data,
       });
+
+      await _cacheService.clearCache();
+
+      transactions = await getTransactionsPagination(
+        user.uid,
+        lastTransactionId: _lastTransactionId,
+      );
+
+      await _cacheService.saveTransactions(transactions);
+
     } catch (e) {
       throw Exception('Erro ao criar transação: $e');
     }
   }
+
 
   Future<List<Map<String, dynamic>>> getTransactions(String usuarioId) async {
     final DatabaseEvent snapshot = await _firebaseService.fetch('transacoes');
@@ -60,12 +79,25 @@ class TransactionsFirebaseService {
     return transactions;
   }
 
-  Future<void> updateTransaction(String transactionId, Map<String, dynamic> data) async {
+  Future<void> updateTransaction(String transactionId, Map<String, dynamic> data, List<Map<String, dynamic>> transactions,) async {
     await _firebaseService.update('transacoes', transactionId, data);
+
+    final index = transactions.indexWhere((t) => t['transactionId'] == transactionId);
+    if (index != -1) {
+      transactions[index] = data;
+      await _cacheService.saveTransactions(transactions);
+    }
   }
 
-  Future<void> deleteTransaction(String transactionId) async {
+  Future<void> deleteTransaction(
+      String transactionId,
+      List<Map<String, dynamic>> transactions,
+      ) async {
     await _firebaseService.delete('transacoes', transactionId);
+
+    transactions.removeWhere((t) => t['transactionId'] == transactionId);
+
+    await _cacheService.saveTransactions(transactions);
   }
 
   Future<List<Map<String, dynamic>>> getTransactionsFiltered({
