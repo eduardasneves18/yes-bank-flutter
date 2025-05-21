@@ -1,23 +1,28 @@
 # Yes-Bank (Flutter)
-Yes-Bank é um aplicativo de gestão financeira simulado desenvolvido em Flutter para dispositivos móveis. O app permite que os usuários registrem transações e consultem o extrato de suas operações. O sistema foi projetado para simular uma experiência de banco digital/ aplicativo de gestão financeira, com foco em simplicidade e nas funcionalidades essenciais para o gerenciamento de suas finanças.
+
+Yes-Bank é um aplicativo de gestão financeira simulado, desenvolvido em **Flutter** para dispositivos móveis. O app permite que os usuários registrem transações e consultem o extrato de suas operações, oferecendo uma experiência similar à de um banco digital ou aplicativo de controle financeiro pessoal. O foco está na **simplicidade** e nas funcionalidades essenciais para o gerenciamento das finanças.
 
 ## Funcionalidades
-Transações: Permite reegistrar transações.
 
-Extrato de transações: O usuário pode consultar o histórico de transações realizadas.
+O sistema possui uma estrutura de login/logout que garante a segurança dos dados do usuário. Além disso:
+
+- **Transações:** Permite registrar novas transações financeiras.
+- **Extrato de transações:** O usuário pode consultar o histórico de transações realizadas.
+- **Gráfico de transações:** O usuário tem uma visualização gráfica das transações realizadas por data.
+- **Lazy loading:** Paginação implementada para melhor desempenho em listas longas.
 
 ## Tecnologias Utilizadas
-Framework: Flutter.
 
-Linguagem de programação: Dart.
-
-Gerenciamento de estado: Provider / MobX.
-
-Armazenamento e manipulação de dados simulados: Local Storage.
-
-Cache: shaed_preference.
+- **Framework:** Flutter
+- **Linguagem de programação:** Dart
+- **Gerenciamento de estado:** Provider / MobX
+- **Armazenamento de dados (simulado):** Local Storage
+- **Cache:** `shared_preferences`
+- **Segurança:** Firebase Auth (login/logout)
+- **Lazy loading:** Estrutura de paginação para carregamento eficiente
 
 ## Pré-requisitos
+
 Antes de rodar o projeto, é necessário ter o Flutter instalado. Siga as instruções na documentação oficial:
 
 📎 https://docs.flutter.dev/get-started/install
