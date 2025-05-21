@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 class YBDropdownField extends StatefulWidget {
@@ -13,7 +15,7 @@ class YBDropdownField extends StatefulWidget {
   final Color? textColor;
   final String? labelText;
   final Color? labelColor;
-  final String? initialValue;
+  final String? value; // <-- NOVO: valor externo (selecionado)
   final Color? dropdownColor;
 
   const YBDropdownField({
@@ -30,24 +32,16 @@ class YBDropdownField extends StatefulWidget {
     this.textColor,
     this.labelText,
     this.labelColor,
-    this.initialValue,
+    this.value, // <-- novo parâmetro
     this.dropdownColor,
   }) : super(key: key);
 
   @override
   _YBDropDownFieldState createState() => _YBDropDownFieldState();
-
 }
 
 class _YBDropDownFieldState extends State<YBDropdownField> {
-  String? _selectedTipoTransacao;
   final List<String> tiposTransacao = ['Transferência', 'Pagamento', 'Recebimento'];
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedTipoTransacao = widget.initialValue;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +60,7 @@ class _YBDropDownFieldState extends State<YBDropdownField> {
         vertical: widthScreen * 0.03,
       ),
       child: DropdownButtonFormField<String>(
-        value: _selectedTipoTransacao,
+        value: widget.value, // usa valor externo
         decoration: InputDecoration(
           labelText: widget.labelText,
           labelStyle: TextStyle(color: widget.labelColor ?? Colors.black),
@@ -93,12 +87,7 @@ class _YBDropDownFieldState extends State<YBDropdownField> {
         icon: Icon(Icons.arrow_drop_down, color: _iconColor),
         dropdownColor: _dropdownColor,
         style: widget.textType ?? TextStyle(color: _textColor),
-        onChanged: (value) {
-          setState(() {
-            _selectedTipoTransacao = value;
-          });
-          widget.onChanged(value);
-        },
+        onChanged: widget.onChanged,
         items: tiposTransacao.map((tipo) {
           return DropdownMenuItem<String>(
             value: tipo,

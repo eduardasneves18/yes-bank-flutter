@@ -20,6 +20,7 @@ O sistema possui uma estrutura de login/logout que garante a segurança dos dado
 - **Cache:** `shared_preferences`
 - **Segurança:** Firebase Auth (login/logout)
 - **Lazy loading:** Estrutura de paginação para carregamento eficiente
+- **Programação reativa:** foi utilizado o conceito de programaçõ reativa através da biblioteca MobX. A principal ideia por trás da reatividade no app é garantir que a interface do usuário responda automaticamente a mudanças nos dados, sem a necessidade de atualizações manuais.
 
 ## Pré-requisitos
 

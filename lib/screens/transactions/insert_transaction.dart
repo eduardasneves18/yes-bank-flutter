@@ -22,6 +22,14 @@ class _TransactionState extends State<Transaction> {
   String? _selectedTipoTransacao;
   BuildContext? _context;
 
+  void _clearFields() {
+    _destinatarioController.clear();
+    _valorController.clear();
+    _dataController.clear();
+    setState(() {
+      _selectedTipoTransacao = null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -154,6 +162,9 @@ class _TransactionState extends State<Transaction> {
                         valor,
                         dataTransacao
                       );
+
+                      _clearFields();
+
                       DialogMessage.showMessage(
                         context: context,
                         title: 'Sucesso',

@@ -75,6 +75,7 @@ class _EditTransactionState extends State<EditTransaction> {
                   security: null,
                 ),
                 YBDropdownField(
+                  value: _selectedTipoTransacao,
                   onChanged: (value) {
                     setState(() {
                       _selectedTipoTransacao = value;
@@ -88,7 +89,6 @@ class _EditTransactionState extends State<EditTransaction> {
                   labelColor: Colors.white,
                   labelText: 'Tipo de transação',
                 ),
-
                 YBNumberField(
                   controller: _valorController,
                   sizeScreen: sizeScreen,
