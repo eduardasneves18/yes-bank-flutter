@@ -11,7 +11,7 @@ class Register extends StatefulWidget {
 }
 
 class _RegisterState extends State<Register> {
-  final UsersFirebaseService _firebaseService = UsersFirebaseService();
+  final UsersFirebaseService _userFirebaseService = UsersFirebaseService();
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -50,7 +50,7 @@ class _RegisterState extends State<Register> {
                 onTap: () => FocusScope.of(context).unfocus(),
                 child: RegisterForm(
                   sizeScreen: sizeScreen,
-                  firebaseService: _firebaseService,
+                  firebaseService: _userFirebaseService,
                   nameController: _nameController,
                   emailController: _emailController,
                   passController: _passController,
@@ -201,6 +201,8 @@ class RegisterForm extends StatelessWidget {
             }
 
             try {
+              await firebaseService.createUser(name, email, senha);
+
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => HomeDashboard()),
