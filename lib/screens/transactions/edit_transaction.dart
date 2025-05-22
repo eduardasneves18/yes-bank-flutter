@@ -8,6 +8,7 @@ import '../../components/fields/yb_dropdown_field.dart';
 import '../../components/screens/yb_app_bar.dart';
 import '../../services/firebase/firebase.dart';
 import '../../services/firebase/transactions/transactions_firebase.dart';
+import '../../utils/user_auth_checker.dart';
 import 'list_transactions.dart';
 
 class EditTransaction extends StatefulWidget {
@@ -31,10 +32,22 @@ class _EditTransactionState extends State<EditTransaction> {
   @override
   void initState() {
     super.initState();
-    _destinatarioController.text = widget.transaction['destinatario'] ?? '';
-    _selectedTipoTransacao = widget.transaction['tipo_transacao'] ?? '';
-    _valorController.text = widget.transaction['valor'].toString();
-    _dataController.text = widget.transaction['data'] ?? '';
+    // _destinatarioController.text = widget.transaction['destinatario'] ?? '';
+    // _selectedTipoTransacao = widget.transaction['tipo_transacao'] ?? '';
+    // _valorController.text = widget.transaction['valor'].toString();
+    // _dataController.text = widget.transaction['data'] ?? '';
+
+    UserAuthChecker.check(
+      context: context,
+      onAuthenticated: () {
+        setState(() {
+          _destinatarioController.text = widget.transaction['destinatario'] ?? '';
+          _selectedTipoTransacao = widget.transaction['tipo_transacao'] ?? '';
+          _valorController.text = widget.transaction['valor'].toString();
+          _dataController.text = widget.transaction['data'] ?? '';
+        });
+      },
+    );
   }
 
   @override

@@ -8,7 +8,7 @@ import '../../components/screens/yb_app_bar.dart';
 import '../../components/yb_menu.dart';
 import '../../services/cache/transaction_cache_service.dart';
 import '../../services/firebase/transactions/transactions_firebase.dart';
-import '../../services/firebase/users/user_firebase.dart';
+import '../../utils/user_auth_checker.dart';
 import '../signout/login/login.dart';
 
 class ListTransactions extends StatefulWidget {
@@ -27,14 +27,22 @@ class _ListTransactionsState extends State<ListTransactions> {
   String? _lastTransactionId;
 
   final ScrollController _scrollController = ScrollController();
-
   bool _isFiltering = false;
 
   @override
   void initState() {
     super.initState();
-    _initializeTransactions();
+    _checkUserAndLoadTransactions();
     _scrollController.addListener(_scrollListener);
+  }
+
+  void _checkUserAndLoadTransactions() {
+    UserAuthChecker.check(
+      context: context,
+      onAuthenticated: () {
+        _initializeTransactions();
+      },
+    );
   }
 
   Future<void> _initializeTransactions() async {
@@ -60,42 +68,26 @@ class _ListTransactionsState extends State<ListTransactions> {
 
     try {
       User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        List<Map<String, dynamic>> transactions = await _firebaseService.getTransactionsPagination(
-          user.uid,
-          lastTransactionId: _lastTransactionId,
-        );
 
-        if (!mounted) return;
+      if (user == null) return;
 
-        if (transactions.isNotEmpty) {
-          setState(() {
-            _lastTransactionId = transactions.last['transactionId'];
+      List<Map<String, dynamic>> transactions = await _firebaseService.getTransactionsPagination(
+        user.uid,
+        lastTransactionId: _lastTransactionId,
+      );
 
-            final newTransactionIds = transactions.map((t) => t['transactionId']).toSet();
-            _transactions.removeWhere((t) => newTransactionIds.contains(t['transactionId']));
-            _transactions.addAll(transactions);
-          });
+      if (!mounted) return;
 
-          await _cacheService.saveTransactions(_transactions);
-        }
-      } else {
-        DialogMessage.showMessage(
-          context: context,
-          title: 'Erro',
-          message: 'Usuário não autenticado. Por favor, faça login novamente.',
-          onConfirmed: () async {
-            final usersService = UsersFirebaseService();
-            User? user = await usersService.getUser();
+      if (transactions.isNotEmpty) {
+        setState(() {
+          _lastTransactionId = transactions.last['transactionId'];
 
-            if (user?.uid == null) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Login()),
-              );
-            };
-          },
-        );
+          final newTransactionIds = transactions.map((t) => t['transactionId']).toSet();
+          _transactions.removeWhere((t) => newTransactionIds.contains(t['transactionId']));
+          _transactions.addAll(transactions);
+        });
+
+        await _cacheService.saveTransactions(_transactions);
       }
     } catch (e) {
       await DialogMessage.showMessage(
@@ -152,7 +144,7 @@ class _ListTransactionsState extends State<ListTransactions> {
   }
 
   Future<void> _editTransaction(Map<String, dynamic> transaction, _transactions) async {
-    final updatedTransaction = await Navigator.push<Map<String, dynamic>>(
+    await Navigator.push<Map<String, dynamic>>(
       context,
       MaterialPageRoute(
         builder: (context) => EditTransaction(transaction: transaction, transactions: _transactions),
@@ -162,15 +154,19 @@ class _ListTransactionsState extends State<ListTransactions> {
 
   Future<void> _deleteTransaction(Map<String, dynamic> transaction, List<Map<String, dynamic>> transactions) async {
     try {
-      await _firebaseService.deleteTransaction(transaction['transactionId'],_transactions,);
+      await _firebaseService.deleteTransaction(
+        transaction['transactionId'],
+        _transactions,
+      );
       if (!mounted) return;
       await DialogMessage.showMessage(
         context: context,
         title: 'Sucesso',
         message: 'Transação deletada!',
-        onConfirmed: () { _initializeTransactions();}
+        onConfirmed: () {
+          _initializeTransactions();
+        },
       );
-
     } catch (e) {
       if (!mounted) return;
       await DialogMessage.showMessage(

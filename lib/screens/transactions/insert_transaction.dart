@@ -15,6 +15,8 @@ import '../../models/cliente.dart';
 import '../../store/cliente_store.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../utils/user_auth_checker.dart';
+
 final TextEditingController _destinatarioController = TextEditingController();
 final TextEditingController _valorController = TextEditingController();
 final TextEditingController _dataController = TextEditingController();
@@ -35,37 +37,46 @@ class _TransactionState extends State<Transaction> {
     super.initState();
     _checkUser();
   }
-
-  void _checkUser() async {
-    final userService = UsersFirebaseService();
-    final user = await userService.getUser();
-
-    if (user == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        DialogMessage.showMessage(
-          context: context,
-          title: 'Erro',
-          message: 'Usuário não autenticado. Por favor, faça login novamente.',
-          onConfirmed: () async {
-            final usersService = UsersFirebaseService();
-            User? user = await usersService.getUser();
-
-            if (user?.uid == null) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Login()),
-              );
-            };
-          },
-        );
-      });
-    }
-
-    setState(() {
-      _userChecked = true;
-      _userAuthenticated = user != null;
-    });
+  void _checkUser() {
+    UserAuthChecker.check(
+      context: context,
+      onAuthenticated: () {
+        setState(() {
+          _userChecked = true;
+          _userAuthenticated = true;
+        });
+      },
+    );
   }
+  // void _checkUser() async {
+  //   final userService = UsersFirebaseService();
+  //   final user = await userService.getUser();
+  //
+  //   if (user == null) {
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       DialogMessage.showMessage(
+  //         context: context,
+  //         title: 'Erro',
+  //         message: 'Usuário não autenticado. Por favor, faça login novamente.',
+  //         onConfirmed: () async {
+  //           final usersService = UsersFirebaseService();
+  //           User? user = await usersService.getUser();
+  //
+  //           if (user?.uid == null) {
+  //             Navigator.pushReplacement(
+  //               context,
+  //               MaterialPageRoute(builder: (context) => Login()),
+  //             );
+  //           };
+  //         },
+  //       );
+  //     });
+  //   }
+  //   setState(() {
+  //     _userChecked = true;
+  //     _userAuthenticated = user != null;
+  //   });
+  // }
 
   void _clearFields() {
     _destinatarioController.clear();
