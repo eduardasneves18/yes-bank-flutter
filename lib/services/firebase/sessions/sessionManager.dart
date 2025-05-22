@@ -10,7 +10,7 @@ import '../../../services/cache/transaction_cache_service.dart';
 import 'package:yes_bank/main.dart';
 
 class SessionManager {
-  static const Duration sessionTimeout = Duration(seconds: 10);
+  static const Duration sessionTimeout = Duration(minutes: 10);
   Timer? _sessionTimer;
 
   final LoginFirebaseAuthService _authService;
