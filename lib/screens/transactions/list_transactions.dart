@@ -8,6 +8,8 @@ import '../../components/screens/yb_app_bar.dart';
 import '../../components/yb_menu.dart';
 import '../../services/cache/transaction_cache_service.dart';
 import '../../services/firebase/transactions/transactions_firebase.dart';
+import '../../services/firebase/users/user_firebase.dart';
+import '../signout/login/login.dart';
 
 class ListTransactions extends StatefulWidget {
   @override
@@ -82,6 +84,17 @@ class _ListTransactionsState extends State<ListTransactions> {
           context: context,
           title: 'Erro',
           message: 'Usuário não autenticado. Por favor, faça login novamente.',
+          onConfirmed: () async {
+            final usersService = UsersFirebaseService();
+            User? user = await usersService.getUser();
+
+            if (user?.uid == null) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Login()),
+              );
+            };
+          },
         );
       }
     } catch (e) {

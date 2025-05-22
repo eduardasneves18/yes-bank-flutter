@@ -50,7 +50,7 @@ class _RegisterState extends State<Register> {
                 onTap: () => FocusScope.of(context).unfocus(),
                 child: RegisterForm(
                   sizeScreen: sizeScreen,
-                  firebaseService: _userFirebaseService,
+                  usersFirebaseService: _userFirebaseService,
                   nameController: _nameController,
                   emailController: _emailController,
                   passController: _passController,
@@ -95,7 +95,7 @@ class Welcome extends StatelessWidget {
 
 class RegisterForm extends StatelessWidget {
   final Size sizeScreen;
-  final UsersFirebaseService firebaseService;
+  final UsersFirebaseService usersFirebaseService;
   final TextEditingController nameController;
   final TextEditingController emailController;
   final TextEditingController passController;
@@ -104,7 +104,7 @@ class RegisterForm extends StatelessWidget {
   const RegisterForm({
     Key? key,
     required this.sizeScreen,
-    required this.firebaseService,
+    required this.usersFirebaseService,
     required this.nameController,
     required this.emailController,
     required this.passController,
@@ -201,7 +201,7 @@ class RegisterForm extends StatelessWidget {
             }
 
             try {
-              await firebaseService.createUser(name, email, senha);
+              await usersFirebaseService.createUser(name, email, senha);
 
               Navigator.push(
                 context,

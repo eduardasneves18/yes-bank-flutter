@@ -1,4 +1,3 @@
-
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +10,9 @@ import 'screens/home/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 Future<Null> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -18,7 +20,6 @@ Future<Null> main() async {
   );
 
   runZoned<Future<void>>(() async {
-    // await Firebase.initializeApp();
     runApp(
       DevicePreview(
         enabled: false,
@@ -35,7 +36,8 @@ class YesBankApp extends StatelessWidget {
     colorScheme: ColorScheme.light(
       primary: Colors.black, // primaryColor
       secondary: Colors.black, // accentColor
-    ),);
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +48,7 @@ class YesBankApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,  // Set the global navigator key
         builder: DevicePreview.appBuilder,
         debugShowCheckedModeBanner: false,
         title: 'Yes Bank',

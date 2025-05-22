@@ -1,11 +1,16 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 import '../../../models/cliente.dart';
+import '../../../screens/transactions/list_transactions.dart';
 import '../../../store/cliente_store.dart';
 import '../../../services/firebase/login/login_firebase.dart';
 import '../../../services/cache/transaction_cache_service.dart';
+import 'package:yes_bank/main.dart';
 
 class SessionManager {
-  static const Duration sessionTimeout = Duration(minutes: 10);
+  static const Duration sessionTimeout = Duration(seconds: 10);
   Timer? _sessionTimer;
 
   final LoginFirebaseAuthService _authService;
@@ -44,6 +49,11 @@ class SessionManager {
     await _authService.signOut();
     _clearUser();
     await _cacheService.clearCache();
+
+    // navigatorKey.currentState?.pushReplacement(
+    //   MaterialPageRoute(builder: (_) => ListTransactions()),
+    // );
+
   }
 
   void dispose() {
